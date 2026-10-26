@@ -399,7 +399,7 @@ def stealth_row(x, ctx_row, tg, target, shift, lam=0.05, unit=None):
 
 
 def closed_loop_rev(seed, cfg=CFG, tg=None, attack=None, gate=None, ctx_noise=0.0,
-                    cap_levels=None, sigma=2.0, k_adapt=4.0, margin=0.5, budget=None):
+                    cap_levels=None, sigma=2.0, k_adapt=4.0, margin=0.5, budget=None, unc=None):
     """Closed-loop run. attack in {None, 'default', 'sig', 'stealth', 'twin',
     'minflip', 'minflip_tw'}; gate in {None, 'full', 'nosub'}.
     Returns a result dict (per-interval arrays included)."""
@@ -496,7 +496,11 @@ def closed_loop_rev(seed, cfg=CFG, tg=None, attack=None, gate=None, ctx_noise=0.
                 r = S / tau
                 lvl = 3 if r >= cfg.gate_levels[2] else 2 if r >= cfg.gate_levels[1] \
                     else 1 if r >= cfg.gate_levels[0] else 0
-                if lvl >= 2 and gate == "full":
+                low_unc = False
+                if gate == "unc":
+                    um, uthr = unc
+                    low_unc = float(np.max(um.predict(ctx_row[None, :]))) <= uthr
+                if lvl >= 2 and (gate == "full" or low_unc):
                     view = xhat
         level[t] = lvl
         proposed = agent_action(y[t], cap_idx, dwell, cfg)
@@ -504,6 +508,8 @@ def closed_loop_rev(seed, cfg=CFG, tg=None, attack=None, gate=None, ctx_noise=0.
         if gate == "full" and lvl in (1, 3) and act == -1:
             act = 0
         if gate == "nosub" and lvl >= 1 and act == -1:
+            act = 0
+        if gate == "unc" and act == -1 and (lvl >= 1 if not (lvl >= 2 and low_unc) else lvl == 3):
             act = 0
         truth = agent_action(x[t], cap_idx, dwell, cfg)
         unsafe[t] = (act == -1 and truth != -1) or (truth == 1 and act != 1)

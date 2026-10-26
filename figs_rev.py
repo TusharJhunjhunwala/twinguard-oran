@@ -21,7 +21,6 @@ DISPLAY = {
     "EWMA (innovation)": "EWMA (innovation)",
     "EWMA + F": "EWMA + F",
     "CUSUM (innovation)": "CUSUM (innovation)",
-    "CUSUM, no restart": "CUSUM, no restart",
     "Physics only": "Physics only",
     "Freshness only": "Freshness only",
     "PCA residual [KPI+ctx] + T + F": "PCA [KPI+ctx] + T + F",
@@ -37,7 +36,7 @@ DISPLAY = {
     "Robust z-score": "Robust z-score",
 }
 TWIN_BASED = {"TwinGuard", "Twin innovation (chi-square)", "EWMA (innovation)", "EWMA + F",
-              "CUSUM (innovation)", "CUSUM, no restart"}
+              "CUSUM (innovation)"}
 CTX = {"PCA residual [KPI+ctx] + T + F", "PCA residual [KPI+ctx]", "Autoencoder [KPI+ctx] + T + F",
        "Autoencoder [KPI+ctx]", "Isolation forest [KPI+ctx]"}
 
